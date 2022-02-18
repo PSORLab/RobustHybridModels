@@ -1,2 +1,2 @@
 # RobustHybridModels
-Examples from Upcoming Robust Optimization of Hybrid Models Paper
+Examples from the upcoming paper on Semi-Infinite Optimization of Hybrid Models
