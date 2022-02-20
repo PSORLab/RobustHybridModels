@@ -1,1 +1,0 @@
-0s 609us/step - loss: 0.0527 - accuracy: 0.9800 - auc: 0.9981 - binary_accuracy: 0.9800 - val_loss: 0.0507 - val_accuracy: 0.9772 - val_auc: 0.9984 - val_binary_accuracy: 0.9772
