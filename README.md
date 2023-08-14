@@ -8,5 +8,5 @@ Examples from the paper [Semi-Infinite Optimization with Hybrid Models](https://
 "Case Study #1: Robust Feasibility of a Nitrification CSTR" can be reproduced using the files in folder `1_nitrification_cstr` and "Case Study 2: Worst-Case Design of Subsea Production Facilities - Mitigation of Domain Violations" can be reproduced using the files in folder `2_subsea_separator`.
 
 # Associated Repositories
-- [McCormick.jl](https://github.com/PSORLab/McCormick.jl).
-- [EAGO.jl](https://github.com/PSORLab/EAGO.jl).
+- [McCormick.jl](https://github.com/PSORLab/McCormick.jl): A forward McCormick operator library
+- [EAGO.jl](https://github.com/PSORLab/EAGO.jl): A development environment for robust and global optimization

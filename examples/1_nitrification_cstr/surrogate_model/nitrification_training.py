@@ -1,11 +1,22 @@
-# -*- coding: utf-8 -*-
+# Copyright (c) 2021: Matthew Wilhelm, Chenyu Wang, Matthew Stuber, 
+# and the University of Connecticut (UConn).
+# This code is licensed under the MIT license (see LICENSE.md for full details).
+#################################################################################
+# RobustHybridModels
+# Examples from the paper Semi-Infinite Optimization with Hybrid Models
+# https://github.com/PSORLab/RobustHybridModels
+#################################################################################
+# examples/1_nitrification_cstr/surrogate_model/nitrification_training.py
+# This file uses Keras to create a neural network for the ammonia oxidation rate
+# for use in examples/1_nitrification_cstr/nitrification_surrogate.jl.
+#################################################################################
 """
 Created on Sun Jan 10 09:26:21 2021
 
-@author: wilhe
+@author: Matthew Wilhelm
 """
 
-# Import general scientific computing packages into enviroment.
+# Import general scientific computing packages into environment
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -23,8 +34,8 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.callbacks import EarlyStopping
 
-folder_path = "C:\\Users\\wilhe\\Dropbox\\My PC (DESKTOP-P6322LG)\\Desktop\\Nitrification_SIP\\Nitrification_SIP\\"
-data_path = 'TrainingData3'
+folder_path = "examples/1_nitrification_cstr/surrogate_model"
+data_path = "nitrification_training_data"
 
 col_names = ['x1', 'x2', 'x3']
 flabel = ['x1', 'x2']
@@ -33,9 +44,9 @@ tlabel = ['x3']
 split_ratio = 0.15
 test_ratio = 0.15
 
-name = data_path+'.csv'
-training_path = folder_path+"Test Train Split\\"+data_path+"_training_set.csv"
-test_path = folder_path+"Test Train Split\\"+data_path+"_test_set.csv"
+name = data_path+".csv"
+training_path = folder_path+"test_train_split/"+data_path+"_training_set.csv"
+test_path = folder_path+"test_train_split/"+data_path+"_test_set.csv"
 
 split_exists = path.exists(training_path) & path.exists(test_path)
 
@@ -43,9 +54,11 @@ if split_exists:
     train_set = pd.read_csv(training_path).astype(float)
     test_set = pd.read_csv(test_path).astype(float)
 else:
-    df = pd.read_csv(folder_path+name, names = col_names).astype(float)   # load data frame
+    # Load data frame
+    df = pd.read_csv(folder_path+name, names = col_names).astype(float)
     df = df.sample(frac = 1)
-    scaler = preprocess.MinMaxScaler()                      # scale data
+    # Scale data
+    scaler = preprocess.MinMaxScaler()
     df[col_names] = scaler.fit_transform(df[col_names])
 
     df['split'] = np.random.randn(df.shape[0], 1)
@@ -68,15 +81,14 @@ model = tf.keras.Sequential()
 model.add(layers.Input(shape = (2,)))           
       
 for q in range(0, 2):
-    model.add(layers.Dense(6, tf.nn.silu))
+    model.add(layers.Dense(8, tf.nn.tanh))
 
 # Add a dense output layer of neurons
-#model.add(layers.Dense(1))
 model.add(layers.Dense(1, 'sigmoid'))
                 
 model.compile(optimizer=keras.optimizers.Adam(learning_rate = 1e-1), loss = 'mse')
 
-# learning rate schedule
+# Learning rate schedule
 def step_decay(epoch):
 	initial_lrate = 1e-2
 	drop = 0.5
@@ -90,11 +102,11 @@ callbacks_list = [lrate]
 fr = model.fit(x_train, y_train, epochs = 500, callbacks=callbacks_list, validation_data = (x_test, y_test))
 
 def Ammonia_oxidation_rate(x):
-    c_NH = x['x1'].to_numpy()#*40.0
-    c_O = x['x2'].to_numpy()#*9.1
-    r_AOmax = 0.67
+    c_NH = x['x1'].to_numpy()
+    c_O = x['x2'].to_numpy()
+    r_AOmax = 0.67/60
     K_OAO = 0.3
-    K_SAO = 0.34
+    K_SAO = 0.24
     K_IAO = 6200
     r_AO = r_AOmax
     r_AO = r_AO*(c_NH/(K_SAO + c_NH + c_NH**2/K_IAO))
@@ -109,7 +121,7 @@ x_test_scaled['x2'] = x_test['x2']*9.1
 y_all_true = Ammonia_oxidation_rate(x_test_scaled)/0.638966464124928
 y_all_dev =  y_all_predicted - y_all_true
 
-plt.scatter(y_all_true,y_all_predicted)
+plt.scatter(y_all_true, y_all_predicted)
 plt.show()
 
 max_dev = max(y_all_dev)
